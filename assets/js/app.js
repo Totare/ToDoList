@@ -11,7 +11,7 @@ export default class App extends Component{
 		this.state = {
 			listElements: [],
 		};
-		
+		this.url = 'http://apitodo.cda.moran-quesnel.com';
 		this.getListElements();
 	}
 
@@ -19,27 +19,28 @@ export default class App extends Component{
 	addElement(e){
 		e.preventDefault();
 
+		var newElement = document.getElementById('newElementList');
+		var self = this;
+
 		axios({
-			method: 'post',
-			url: 'myapi',
+			method: 'put',
+			url: self.url,
 			data: {
-				element: document.getElementById('newElementList')
+				"description" : newElement.value
 			}
 		})
 		.then(res => {
-		//   const listElements = res.data.results;
-			// const newElement = {name:'coucou'}
-			// this.state.listElements.push({name:'coucou'});
-		})
-
-		let newList = this.state.listElements.concat({name:'coucou'});
-		this.setState({ listElements: newList });
+			const resElement = res.data;
+			var newList= this.state.listElements.concat(resElement);
+			newElement.value = "";
+			this.setState({ listElements: newList });
+		});		
 	}
 
 	getListElements(number) {
-		axios.get('http://sv2.localhost/get')
+		axios.get(this.url)
 		.then(res => {
-		  const listElements = res.data.results;
+		  const listElements = res.data;
 		  this.setState({ listElements });
 		})
 	}
@@ -54,14 +55,13 @@ export default class App extends Component{
 					<button type = "submit" onClick={this.addElement.bind(this)}> Add </button>
 				</div>
 				<ul>
-					{ listElements.map(listElements => <li>{listElements.name}</li>)}
+					{ listElements.map(listElements => <li>{listElements.description}</li>)}
 				</ul>
 
 			</section>
 		)
 	}
 };
-
 
 
 
